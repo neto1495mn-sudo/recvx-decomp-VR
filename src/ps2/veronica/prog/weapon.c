@@ -525,6 +525,9 @@ int bhCheckGunAtari(GA_WORK* gap)
     }
     
     wp_flg = WpnTab[wno].flg;
+#ifdef TARGET_PC
+    { extern int vr_precise_parts(GA_WORK* gap); if (vr_precise_parts(gap)) wp_flg |= 0x8; }   /* VR: hit by body part, as the 3D model (pc/glue/vr_glue.c) */
+#endif
     wp_hef = WpnTab[wno].hiteff;
     
     if (((gap->at_flg & 0x4)) && ((wp_flg & 0x5000))) 
@@ -630,7 +633,12 @@ int bhCheckGunAtari(GA_WORK* gap)
     
     for (i = 0; i < sys->ewk_n; i++, pp++) 
     {
+#ifdef TARGET_PC
+        extern int vr_shot_wakes(BH_PWORK* pp, GA_WORK* gap);   /* VR: a sleeping zombie can be shot (and wakes) */
+        if ((((pp->flg & 0x1)) && (((pp->flg & 0x20)) || vr_shot_wakes(pp, gap)) && (!(pp->flg & 0x2))) && (!(pp->stflg & 0x1000000)) && (((!(pp->flg & 0x80)) || (!(((O_WRK*)pp->lkwkp)->stflg & 0x1000000))) && (!(pp->flg & 0x4))))
+#else
         if ((((pp->flg & 0x1)) && ((pp->flg & 0x20)) && (!(pp->flg & 0x2))) && (!(pp->stflg & 0x1000000)) && (((!(pp->flg & 0x80)) || (!(((O_WRK*)pp->lkwkp)->stflg & 0x1000000))) && (!(pp->flg & 0x4))))
+#endif
         {
             ap.x = 0.5f * (pp->watr.c1.x + pp->watr.c2.x);
             ap.y = 0.5f * (pp->watr.c1.y + pp->watr.c2.y);
@@ -688,6 +696,14 @@ label_1:
                 } 
                 else 
                 { 
+#ifdef TARGET_PC
+                    if (!pp->cpcl && npCollisionCheckCCEx(&gatr, &pp->watr, &ap) != 0)   /* VR by parts: an enemy without parts by its body */
+                    {
+                        npDistanceP2C(&ap, &pp->watr, &ps);
+                        kno = 0;
+                        goto label_2;
+                    }
+#endif
                     if ((kno = bhCheckCapCol2Capsule(pp, &gatr, &ps)) >= 0) 
                     {
 label_2:
