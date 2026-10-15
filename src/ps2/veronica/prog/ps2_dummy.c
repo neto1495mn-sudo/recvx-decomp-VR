@@ -2594,6 +2594,14 @@ void Ps2ShadowDraw()
     unsigned long xy0, xy1; 
     int iv4[4], iv0[4];       
 
+#ifdef TARGET_PC
+    {   /* VR: the shadow is a screen-space picture pasted over the frame - in a headset it floats
+           as a rectangle in the air (vr_glue.c, ini vr_shadows) */
+        extern int vr_hide_shadows(void);
+        if (vr_hide_shadows()) return;
+    }
+#endif
+
     if ((Ps2_shadow_vec[0] < 1536.0f) || (Ps2_shadow_vec[0] >= 2560.0f))
     {
         return;
