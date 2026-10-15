@@ -511,6 +511,12 @@ int bhCheckGunAtari(GA_WORK* gap)
     float px, py, pz; // not from DWARF 
     static int igct;     
     
+#ifdef TARGET_PC
+    {   /* VR: the player's shots leave the weapon in the hand and go where it points (pc/glue/vr_glue.c) */
+        extern void vr_gun_ray(GA_WORK* gap);
+        vr_gun_ray(gap);
+    }
+#endif
     wno = gap->wpn_no;
     
     if ((gap->at_flg & 0x100)) 

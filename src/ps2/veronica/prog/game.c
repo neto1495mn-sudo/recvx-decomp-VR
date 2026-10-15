@@ -1,5 +1,6 @@
 #ifdef TARGET_PC
 int vr_hide_player(void);   /* pc/glue/vr_glue.c */
+void vr_draw_hands(void* p);   /* BH_PWORK* (declared before the types) */
 #endif
 #include "../../../ps2/veronica/prog/game.h"
 #include "../../../ps2/veronica/prog/MdlPut.h"
@@ -406,13 +407,15 @@ void bhAllDrawModel()
             if (!(plp->mdflg & 0x20)) {
                 if (bhCheckClipModel(plp) == 0) {
 #ifdef TARGET_PC
-                    if (!vr_hide_player() && (!actor_on || !actor_put_player()))   /* "You appear as" another model; VR: the camera is in the head */
+                    if (vr_hide_player()) vr_draw_hands(plp);   /* VR: the camera is in the head - only the hands */
+                    else if (!actor_on || !actor_put_player())   /* "You appear as" another model */
 #endif
                     bhPutModel(plp);
                 }
             } else {
 #ifdef TARGET_PC
-                if (!vr_hide_player() && (!actor_on || !actor_put_player()))
+                if (vr_hide_player()) vr_draw_hands(plp);
+                else if (!actor_on || !actor_put_player())
 #endif
                 bhPutModel(plp);
             }
