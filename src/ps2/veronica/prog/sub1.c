@@ -8888,6 +8888,9 @@ int bhSearchBullet()
 
     st = &swork; 
 
+#ifdef TARGET_PC
+    { extern int vr_block_autoreload(void); if (vr_block_autoreload()) return 0; }   /* VR: reloading is by hand (pc/glue/vr_glue.c) */
+#endif
     if (!(sys->st_flg & 0x8000000)) 
     {
         max = 8;
