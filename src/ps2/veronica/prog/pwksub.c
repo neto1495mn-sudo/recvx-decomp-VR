@@ -2700,6 +2700,9 @@ void bhSetGunFire(BH_PWORK* pp, int wno, int jno, int hand, int ang)
     float len;     
     int eno;       // not from DWARF
     EF_WORK* eft2; // not from DWARF
+#ifdef TARGET_PC
+    { extern int vr_dual_block(void* pp, int jno); if (vr_dual_block(pp, jno)) return; }   /* VR: that hand did not fire */
+#endif
 
     if ((WpnTab[wno].flg & 0x4)) 
     {
@@ -3285,6 +3288,9 @@ void bhSetYakkyou(BH_PWORK* pp, int wno, int jno, int hand, int ang) // fifth pa
             }
         }
     }
+#ifdef TARGET_PC
+    { extern int vr_dual_block(void* pp, int jno); if (vr_dual_block(pp, jno)) return; }   /* VR: that hand did not fire */
+#endif
     
     eft = &WpnEffTab[wno][3];  
     

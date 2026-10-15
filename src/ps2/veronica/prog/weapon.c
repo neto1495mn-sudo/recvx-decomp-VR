@@ -513,8 +513,8 @@ int bhCheckGunAtari(GA_WORK* gap)
     
 #ifdef TARGET_PC
     {   /* VR: the player's shots leave the weapon in the hand and go where it points (pc/glue/vr_glue.c) */
-        extern void vr_gun_ray(GA_WORK* gap);
-        vr_gun_ray(gap);
+        extern int vr_gun_ray(GA_WORK* gap);
+        if (vr_gun_ray(gap)) return 0;   /* a dual weapon's hand whose trigger is not pulled: no shot */
     }
 #endif
     wno = gap->wpn_no;
@@ -767,6 +767,9 @@ label_2:
                                     }
                                     
                                     pp->djnt_no = kno;
+#ifdef TARGET_PC
+                                    { extern int vr_part_damage(BH_PWORK*, int, int, int); int vr_d0 = pp->dam[kno];
+#endif
                                     
                                     if (nr < 15.0f) 
                                     {
@@ -786,6 +789,9 @@ label_2:
                                         
                                         pp->comb_flg |= 0x40;
                                     }
+#ifdef TARGET_PC
+                                    pp->dam[kno] = vr_part_damage(pp, kno, vr_d0, pp->dam[kno]); }   /* VR: by the body part hit (pc/glue/vr_glue.c) */
+#endif
                                 }
                             }
                         }
@@ -840,6 +846,9 @@ label_2:
         }
         
         pp->djnt_no = kno;
+#ifdef TARGET_PC
+        { extern int vr_part_damage(BH_PWORK*, int, int, int); int vr_d0 = pp->dam[kno];
+#endif
         
         if (nr < 15.0f)
         {
@@ -859,6 +868,9 @@ label_2:
             
             pp->comb_flg |= 0x40;
         } 
+#ifdef TARGET_PC
+        pp->dam[kno] = vr_part_damage(pp, kno, vr_d0, pp->dam[kno]); }   /* VR: by the body part hit (pc/glue/vr_glue.c) */
+#endif
         
         if ((wp_flg & 0x20000000))
         {
@@ -1151,6 +1163,9 @@ void bhCheckKnifeAtari(GA_WORK* gap)
                 pp->djnt_no = kno;
                 
                 pp->dam[kno] += EneDamNear[pp->id][gap->wpn_no];
+#ifdef TARGET_PC
+                { extern int vr_part_damage(BH_PWORK*, int, int, int); pp->dam[kno] = vr_part_damage(pp, kno, pp->dam[kno] - EneDamNear[pp->id][gap->wpn_no], pp->dam[kno]); }
+#endif
                 
                 pp->comb_flg |= 0x10; 
             }
