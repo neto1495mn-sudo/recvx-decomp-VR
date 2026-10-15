@@ -644,6 +644,12 @@ void bhDrawObject(O_WRK* op)
 {
     O_WRK* opp; // not from DWARF
     
+#ifdef TARGET_PC
+    {   /* VR: the camera is in the head - the player's ponytail (1200, 1211) is not drawn; the weapon/hand (1210) is */
+        extern int vr_hide_player(void);
+        if ((op->id == 1200 || op->id == 1211) && op->lkwkp == (unsigned char*)plp && vr_hide_player()) return;
+    }
+#endif
     if ((op->flg & 0x80))
     {
         opp = (O_WRK*)op->lkwkp;
