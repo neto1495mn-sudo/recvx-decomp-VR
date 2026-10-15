@@ -2216,7 +2216,12 @@ void bhSysCallMonitor()
         bhControlEffect();
     }
 
+#ifdef TARGET_PC
+    extern int pc_fast_doors(void);   /* fast loads: no "now loading" text (it would only flash) */
+    if ((NowLoadDisp != 0) && (sys->mes_sp != NULL) && !pc_fast_doors()) 
+#else
     if ((NowLoadDisp != 0) && (sys->mes_sp != NULL)) 
+#endif
     {
         bhDispMessage(400.0f, 400.0f, -0.9f, 1, 491, 0, 0);
     } 
