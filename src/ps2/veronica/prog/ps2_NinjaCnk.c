@@ -550,7 +550,9 @@ static int pc_show_hidden(NJS_CNK_OBJECT* obj)
     NJS_CNK_MODEL* m = obj->model;
     NJS_POINT3 c;
     float z, r, sx, half;
-    if (tps_cam_active) return pc_is_room_object(obj);   /* third person: every room part */
+    /* third person: every room part; not a node without a model (hidden for good, cut.c bhSetCut
+       never touches it: drawing it read through a NULL model in 6/8, 7/25, 9/8, 9/17) */
+    if (tps_cam_active) return m != NULL && pc_is_room_object(obj);
     if (pc_hor_scale() <= 1.0f || m == NULL || m->r <= 0 || !pc_is_room_object(obj)) return 0;
     njCalcPoint(NULL, &m->center, &c);
     if (c.z - m->r < _fNaViwClipNear) return 0;
