@@ -22,6 +22,14 @@
 
 #include <mathf.h>
 
+#ifdef TARGET_PC   /* a sound number's bank: MWCC compiles the signed / 256 as an arithmetic shift (retail: sra 8, rounding
+                      down); C rounds toward zero, which gave a negative number (bit 31: a MIDI sound such as the
+                      typewriter's 0x80000242, the item box lid's, the computers') bank 3 instead of 2 */
+#define SE_BANK_NO(SeNo) (((SeNo) >> 8) & 0xF)
+#else
+#define SE_BANK_NO(SeNo) (((SeNo) / 256) & 0xF)
+#endif
+
 unsigned char* pConfigWork __attribute__((aligned(64)));
 unsigned char* pSoundAfs;
 unsigned short* pSpqList;
@@ -911,7 +919,7 @@ int SetupSeGenericParm(int SlotNo, int SeNo, NJS_POINT3* pPos, int Flag, unsigne
         RequestInfo.ListNo = -1;
     }
     
-    RequestInfo.BankNo = (SeNo / 256) & 0xF;
+    RequestInfo.BankNo = SE_BANK_NO(SeNo);
     
     RequestInfo.Priority = 0;
     
@@ -1349,7 +1357,7 @@ void CallSystemSeBasic(int SeNo, int Volume, int FxLevel)
 {
     int SlotDef[2] = { 17, 18 };
 
-    RequestInfo.BankNo = (SeNo / 256) & 0xF;
+    RequestInfo.BankNo = SE_BANK_NO(SeNo);
     RequestInfo.ListNo = SeNo;
     
     RequestInfo.Priority = 0;
@@ -1651,7 +1659,7 @@ void CallBackGroundSeEx(unsigned int SlotNo, int SeNo, short Timer)
     }
     
     RequestInfo.SlotNo = SlotDef[SlotNo];
-    RequestInfo.BankNo = (SeNo / 256) & 0xF;
+    RequestInfo.BankNo = SE_BANK_NO(SeNo);
     RequestInfo.ListNo = SeNo;
     
     RequestInfo.Priority = 0;
@@ -1875,7 +1883,7 @@ int CallNativeEventSe(int SlotNo, NJS_POINT3* pPos, int SeNo, int Mode)
     SeNo = (SeNo & 0xFFFF00FF) | 0x200;
     
     RequestInfo.SlotNo = SlotDef[SlotNo];
-    RequestInfo.BankNo = (SeNo / 256) & 0xF;
+    RequestInfo.BankNo = SE_BANK_NO(SeNo);
     RequestInfo.ListNo = SeNo;
     
     RequestInfo.Priority = 0;
@@ -2632,7 +2640,7 @@ void CallObjectSe2(unsigned int SlotNo, Object* oip, int Flag)
         } 
         else 
         {
-            RequestInfo.BankNo = (oip->SeNo / 256) & 0xF;
+            RequestInfo.BankNo = SE_BANK_NO(oip->SeNo);
             RequestInfo.ListNo = oip->SeNo;
         }
         

@@ -14,6 +14,10 @@ void (*bhJumpCnkDraw[4])(BH_PWORK* ewP, NJS_CNK_OBJECT* objP, O_WORK* owP, int o
 };
 
 // 100% matching! 
+#ifdef TARGET_PC
+extern int pose_trace_mark;
+void pose_trace(BH_PWORK* p);
+#endif
 void bhPutModel(BH_PWORK* ewP) 
 {
     // these variables are arranged in an order different from the debugging symbols
@@ -22,6 +26,12 @@ void bhPutModel(BH_PWORK* ewP)
     ML_WORK* mlwP;     
     unsigned int c3df; 
     
+#ifdef TARGET_PC
+    if (pose_trace_mark)
+    {
+        pose_trace(ewP);   /* test aid RECVX_POSE_TRACE (pc/glue/pose_trace.c) */
+    }
+#endif
     mlwP = ewP->mlwP;
     owP = mlwP->owP;
     

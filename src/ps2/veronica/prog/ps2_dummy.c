@@ -13,6 +13,7 @@
 #include "../../../ps2/veronica/prog/main.h"
 #ifdef TARGET_PC
 static void pc_native_packet_test(unsigned int h, unsigned long test);
+static unsigned long pc_ot_poly;   /* Ps2AddOT: the entry is this effect polygon (pc_effect_poly) */
 #endif
 
 // the three vars below were originally defined as unsigned int in ps2_NaFog.c, and redeclared as unsigned long here
@@ -758,6 +759,9 @@ void Ps2AddPrim3D(unsigned long prim, void* dp, unsigned int num)
 
     if ((prim & 0x20000000000000)) 
     {
+#ifdef TARGET_PC
+        pc_ot_poly = pc_effect_poly();   /* frame interpolation: drawn later from the ordering table */
+#endif
         Ps2AddOT((void*)0x70000000, num, ((float*)p)[(12 * num) + 3], prim);
     }
     else 
@@ -1628,7 +1632,13 @@ void Ps2AddOT(void* p, unsigned int num, float z, unsigned long prim)
             host_log("Ps2AddOT: ordering table full (%u entries), primitives dropped\n", Ps2_ot_list_no);
         }
 
+        pc_ot_poly = 0;
         return;
+    }
+
+    if ((pc_ot_poly != 0) && (((unsigned char*)Ps2_PP + 64 + (((num * 3) + 3) * 16)) > (unsigned char*)((int)&Ps2_PBUFF | 0x30000000) + PC_PBUFF_SIZE))
+    {
+        pc_ot_poly = 0;   /* no room for the tag: the entry as the original */
     }
 
 #endif
@@ -1718,7 +1728,11 @@ void Ps2AddOT(void* p, unsigned int num, float z, unsigned long prim)
     
     PS2_PTRADD(Ps2_PP, 16); 
         
+#ifdef TARGET_PC
+    PS2_POSTINC(long, Ps2_PP) = DMAnext | (((*(long*)p) & 0xFFFFFFF) + (pc_ot_poly != 0 ? 2 : 0));
+#else
     PS2_POSTINC(long, Ps2_PP) = DMAnext | ((*(long*)p) & 0xFFFFFFF); 
+#endif
     PS2_POSTINC(long, Ps2_PP) = 0; 
     
     PS2_POSTINC(long, Ps2_PP) = SCE_GIF_SET_TAG(1, 0, 0, 0, 0, 1); 
@@ -1733,6 +1747,16 @@ void Ps2AddOT(void* p, unsigned int num, float z, unsigned long prim)
     { 
         PS2_POSTINC(u_long128, Ps2_PP) = PS2_POSTINC(u_long128, p); 
     } 
+#ifdef TARGET_PC
+    if (pc_ot_poly != 0)   /* after the vertices (the walker patches the entry's first qwords): the effect's tag (pc/src/gs/native.h STREAM_TAG_REG) */
+    {
+        PS2_POSTINC(long, Ps2_PP) = SCE_GIF_SET_TAG(1, 1, 0, 0, SCE_GIF_PACKED, 1);
+        PS2_POSTINC(long, Ps2_PP) = SCE_GIF_PACKED_AD;
+        PS2_POSTINC(long, Ps2_PP) = pc_ot_poly;
+        PS2_POSTINC(long, Ps2_PP) = STREAM_TAG_REG;
+        pc_ot_poly = 0;
+    }
+#endif
     
     Ps2_ot_list_no++; 
 } 

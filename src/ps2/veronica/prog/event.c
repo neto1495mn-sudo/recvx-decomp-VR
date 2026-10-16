@@ -1373,9 +1373,11 @@ unsigned int bhPlItemCheck()
     bhScePtr++;
 
 #ifdef TARGET_PC
-    if ((v0 == 31) && (pc_no_ink_ribbon() != 0))
+    /* PC option: the typewriters' ink ribbon check passes without one (pc/glue/coop_glue.c); not in 0/9,
+       where the metal detector's script checks the same item (ink ribbons count as metal there) */
+    if ((v0 == 31) && (pc_no_ink_ribbon() != 0) && !((sys->stg_no == 0) && (sys->rom_no == 9)))
     {
-        return 1; /* PC option: the typewriters' ink ribbon check passes without one (pc/glue/coop_glue.c) */
+        return 1;
     }
     
 #endif

@@ -928,6 +928,9 @@ void bhDrawEffect()
     {
         bhDrawThlEffect3D((unsigned int*)sys->ef_thl, sys->ef_thln);
     }
+#ifdef TARGET_PC
+    pc_effect_tag(NULL);
+#endif
     
     if (sys->ef_ntx2dn != 0) 
     {
@@ -1204,6 +1207,9 @@ void bhDrawNtxEffect3D(unsigned int* owp, int ct)
         njPushMatrixEx();
         
         op = (O_WRK*)*owp++;
+#ifdef TARGET_PC
+        pc_effect_tag(op);   /* frame interpolation: this effect's polygons (pc/glue/view_glue.c) */
+#endif
         
         if (((op->flg & 0x1000000)) || ((op->stflg & 0x1000000)) || (((sys->gm_flg & 0x4000)) && ((op->mdflg & 0x40))))
         {
@@ -1324,6 +1330,9 @@ void bhDrawTrsEffect3D(unsigned int* owp, int ct)
         njPushMatrixEx();
         
         op = (O_WRK*)*owp++;
+#ifdef TARGET_PC
+        pc_effect_tag(op);   /* frame interpolation: this effect's polygons (pc/glue/view_glue.c) */
+#endif
         
         if ((((op->flg & 0x1000000)) || ((op->stflg & 0x1000000)) || (op->tex_id < 0)) || (((sys->gm_flg & 0x4000)) && ((op->mdflg & 0x40)))
         || ((!(sys->sp_flg & 0x8)) && ((op->id == 9) && (op->type == 2)) && ((plp->stflg & 0x1000000)))
@@ -1467,6 +1476,9 @@ void bhDrawOpqEffect3D(unsigned int* owp, int ct)
         njPushMatrixEx();
         
         op = (O_WRK*)*owp++;
+#ifdef TARGET_PC
+        pc_effect_tag(op);   /* frame interpolation: this effect's polygons (pc/glue/view_glue.c) */
+#endif
         
         if ((((op->flg & 0x1000000)) || ((op->stflg & 0x1000000)) || (op->tex_id < 0)) || (((sys->gm_flg & 0x4000)) && ((op->mdflg & 0x40)))) 
         {
@@ -1604,6 +1616,9 @@ void bhDrawThlEffect3D(unsigned int* owp, int ct)
         njPushMatrixEx();
         
         op = (O_WRK*)*owp++;
+#ifdef TARGET_PC
+        pc_effect_tag(op);   /* frame interpolation: this effect's polygons (pc/glue/view_glue.c) */
+#endif
         
         if ((((op->flg & 0x1000000)) || ((op->stflg & 0x1000000)) || (op->tex_id < 0)) || (((sys->gm_flg & 0x4000)) && ((op->mdflg & 0x40)))) 
         {

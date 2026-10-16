@@ -278,6 +278,7 @@ void bhSetPad()
         pad = tps_pad(pad);
     }
     
+    pad = modern_pad(pad);   /* modern controls for the fixed cameras (modern_glue.c) */
     pad = knife_pad(pad);
     pad = menu_pad(pad);
     pad = trade_pad(pad);   /* co-op trade screen: its input, the player stands still */

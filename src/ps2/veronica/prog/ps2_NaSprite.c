@@ -139,6 +139,23 @@ void	njDrawSprite2D( NJS_SPRITE *sp, Int n, Float pri, Uint32 attr )
         swap_g = swap;
     }
     
+#ifdef TARGET_PC   /* the PS2 samples a pixel at its top-left corner, so from the left/top edge's UV to one
+                      pixel's step before the right/bottom edge's; drawn at pixel centres (more so at higher
+                      internal resolutions) the right/bottom pixels sampled the texel past the sprite's
+                      rectangle: dark lines between the menus' frame tiles. The right/bottom UV is pulled
+                      back by that step, so the sprite covers what the PS2 samples (1:1 sprites: half a
+                      texel inside each edge). */
+    if (ap->sx * sp->sx >= 1.0f)
+    {
+        swap_d = swap_c = swap_c - (int)((swap_c - swap_a) / (ap->sx * sp->sx));
+    }
+
+    if (ap->sy * sp->sy >= 1.0f)
+    {
+        swap_h = swap_g = swap_g - (int)((swap_g - swap_e) / (ap->sy * sp->sy));
+    }
+#endif
+
     switch (((sp->ang + 0xFFFF) & 0xC000) / 16384) 
     {                         
     case 0:

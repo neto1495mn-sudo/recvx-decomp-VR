@@ -7850,7 +7850,9 @@ void ItemBoxChange(S_WORK* st, unsigned short ibcsr)
             {
                 lt_c3 = max + 1;
                 lt_c2 = lt_c;
-                
+#ifdef TARGET_PC   /* as the PS2 code: the box's item goes to the last bag slot (sorted in), not lost */
+                itemid2 = itemid3;
+#endif
                 itemid3 = 0;
                 
                 chk2 = 1;
@@ -7881,6 +7883,23 @@ void ItemBoxChange(S_WORK* st, unsigned short ibcsr)
         {
             if ((id2 != standard[sys->ply_id][0]) && (id2 != standard[sys->ply_id][1])) 
             {
+#ifdef TARGET_PC   /* as the PS2 code: the box's item to the last bag slot when there is room; an
+                      empty box slot with a full bag just takes the lighter (no last-slot write) */
+                if (bmax >= 1)
+                {
+                    lt_c3 = max + 1;
+                    lt_c2 = lt_c;
+
+                    itemid2 = itemid3;
+                    itemid3 = 0;
+
+                    chk2 = 1;
+                }
+                else if (!id2)
+                {
+                    chk2 = 1;
+                }
+#else
                 if ((bmax >= 1) || (!id2)) 
                 {
                     lt_c3 = max + 1;
@@ -7890,6 +7909,7 @@ void ItemBoxChange(S_WORK* st, unsigned short ibcsr)
                     
                     chk2 = 1;
                 }
+#endif
             } 
             else 
             {
@@ -7904,8 +7924,11 @@ void ItemBoxChange(S_WORK* st, unsigned short ibcsr)
             {
                 lt_c3 = lt_c;
                 lt_c2 = 1;
-                
+#ifdef TARGET_PC   /* as the PS2 code: the lighter goes to its own slot, the chosen slot's item into the box */
+                itemid2 = 0;
+#else
                 chk2 = 0;
+#endif
             }
         }
     }
@@ -7925,6 +7948,9 @@ void ItemBoxChange(S_WORK* st, unsigned short ibcsr)
                 {
                     chk2 = 2;
                     num1 = x + 2;
+#ifdef TARGET_PC   /* as the PS2 code: the merge below looks for the found stack's id, not the empty slot's */
+                    id1 = id2;
+#endif
                     break;
                 }
             }
@@ -7953,6 +7979,52 @@ void ItemBoxChange(S_WORK* st, unsigned short ibcsr)
         st->bxp[ibcsr] = st->pip[lt_c];
         st->pip[num1]  = itemid3;
 
+#ifdef TARGET_PC
+        /* The PS2 code (0x2A53E0), which this fuzzy match got wrong: the slot lt_c3 gets the item
+           kept aside above (the box's item into the last bag slot, or an emptied slot), where the
+           match wrote 2 and lost the item taken out on the lighter slot; and the equipped slot
+           index follows the bag's next sort (two-slot items first, no gaps) in these cases. */
+        if (lt_c3)
+        {
+            st->pip[lt_c3] = itemid2;
+        }
+
+        if (*st->pip > 1)
+        {
+            if (itemid1 != 1)
+            {
+                if ((!id2) || (id2 == standard[sys->ply_id][0]) || (id2 == standard[sys->ply_id][1]))
+                {
+                    if (itemid1 < *st->pip)
+                    {
+                        *st->pip -= 1;
+                    }
+                }
+                else if (id1)
+                {
+                    if ((itemdata[id2].type & 0x100))
+                    {
+                        if ((!(itemdata[id1].type & 0x100)) && (!(itemdata[arms].type & 0x100)) && (*st->pip < itemid1))
+                        {
+                            *st->pip += 1;
+                        }
+                    }
+                    else if (((itemdata[id1].type & 0x100)) && (itemid1 < *st->pip) && ((itemdata[arms].type & 0x100)))
+                    {
+                        *st->pip -= 1;
+                    }
+                }
+                else if (((itemdata[id2].type & 0x100)) && (!(itemdata[arms].type & 0x100)))
+                {
+                    *st->pip += 1;
+                }
+            }
+            else if (((itemdata[id2].type & 0x100)) && (!(itemdata[(st->pip[*st->pip] >> 16) & 0xFF].type & 0x100)))
+            {
+                *st->pip += 1;
+            }
+        }
+#else
         if (lt_c3) 
         {
             st->pip[lt_c3] = 2;
@@ -7995,6 +8067,7 @@ void ItemBoxChange(S_WORK* st, unsigned short ibcsr)
         {
             *st->pip += 1;
         }
+#endif
 
         if ((itemid1 != 1) && ((st->listcsr_0 > sakai) || (((st->listcsr_2 & 0x1)) && (st->listcsr_0 == (sakai - 1))))) 
         {

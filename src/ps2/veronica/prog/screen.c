@@ -9,12 +9,10 @@
 #include "../../../ps2/veronica/prog/ps2_NaMatrix.h"
 #include "../../../ps2/veronica/prog/ps2_NaSystem.h"
 #include "../../../ps2/veronica/prog/ps2_NaTextureFunction.h"
-/* #include "../../../ps2/veronica/prog/ps2_NaView.h" - the devs didn't include this originally */
-#ifdef TARGET_PC
-/* without its prototype the float of njSetScreenProjection(dist) goes as a double on x86 and the
-   screen distance comes back wrong (2.0 instead of ~600) after bhDrawSmallScreenRenderTexture: the
-   weapon room's switch panel (RM_1050) was drawn tiny on a black screen */
-void njSetScreenProjection(float dist);
+/* #include "../../../ps2/veronica/prog/ps2_NaView.h" - the devs didn't include this originally */ 
+#ifdef TARGET_PC   /* without the prototype njSetScreenProjection(dist) passes a double, read back as a float of ~2:
+                      the 3D after the small screen (bhDrawSmallScreenRenderTexture) came out tiny */
+#include "../../../ps2/veronica/prog/ps2_NaView.h"
 #endif
 #include "../../../ps2/veronica/prog/ps2_NinjaCnk.h"
 #include "../../../ps2/veronica/prog/ps2_dummy.h"
@@ -876,6 +874,9 @@ void bhDrawFullScreenRenderTexture()
     
     njSetScreen(&scr_tex);
     
+#ifdef TARGET_PC
+    pc_rtex_wide = pc_native_rtex();   /* hor+: capture the widened view (the 3D above was drawn with the widened clip volume) */
+#endif
     njRenderTextureNum(0);
     njSetTextureNum(0);
     
@@ -934,6 +935,15 @@ void bhDrawFullScreenRenderTexture()
         tvh[30] = sys->rpb[y++];
         tvh[31] = sys->rpb[y1++]; 
         
+#ifdef TARGET_PC
+        if (pc_native_rtex())   /* the wide capture goes back over the widened view (StoreRenderTex on the GPU only) */
+        {
+            for (int k = 0; k < 32; k++)
+            {
+                tvh[k].x = 320.0f + (tvh[k].x - 320.0f) * pc_hor_scale();
+            }
+        }
+#endif
         njDrawTextureH(tvh, 32, 1, 0);
     } 
     

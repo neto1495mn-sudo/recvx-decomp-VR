@@ -1426,6 +1426,8 @@ void bhControlPlayer()
         {
             tps_player();
         }
+
+        modern_player();   /* modern controls: turn towards the direction held (modern_glue.c) */
 #endif
         
         if ((plp->flg & 0x100000)) 

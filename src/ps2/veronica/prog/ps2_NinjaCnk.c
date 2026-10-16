@@ -1532,7 +1532,33 @@ CHUNK_HEAD* njCnkCvVnPs2(CHUNK_HEAD* pCnk)
     pBuffer++;
     
     fpCnk += 8;
-    
+
+#ifdef TARGET_PC
+    /* the loop below in one call (pc/src/ps2/vu.c vu0_calcpoint_n: several vertices at a time,
+       the same outputs and VU state); it leaves vf11.x, the fog input, in each fFog */
+    if (ulIndex != 0)
+    {
+        vu0_calcpoint_n(fpCnk, pBuffer, ulIndex);
+
+        pBuffer[-1].fFog = njCalcFogPowerEx(fog);
+
+        for ( ; ulIndex != 1; ulIndex--, pBuffer++, fpCnk += 8)
+        {
+            pBuffer->fFog = njCalcFogPowerEx(pBuffer->fFog);
+        }
+
+        fog = pBuffer->fFog;
+
+        Vu0ClipFlag = vu_cfc2(11);
+
+        ulIndex--;
+
+        pBuffer++;
+
+        fpCnk += 8;
+    }
+#endif
+
     while (ulIndex != 0)
     {
 #ifndef TARGET_PC

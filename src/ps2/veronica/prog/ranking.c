@@ -139,7 +139,12 @@ void RankingInit()
                 ply_id = sys->ply_id;
             }
             
+#ifdef TARGET_PC   /* the PS2 original sets the cleared-game flag here, a no-op there (BATTLE GAME needs it); with the
+                      port's "Battle Game unlocked" it would mark the story cleared, and the first real clear would then
+                      skip its unlocks (0xD: Chris in Battle Game, the message) */
+#else
             sys->ssd_flg |= 0x1;
+#endif
             
             rk->alpha = 0;
             
