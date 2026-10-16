@@ -2346,6 +2346,16 @@ int Adv_BioCvTitle()
         DisplayGameModePlate(ap->Cursor[0], ap->CursorMax[0], ap->FlushCount, 1); 
         break; 
     case 9:
+#ifdef TARGET_PC
+        if (pc_quickload_take())   /* F10: save 15, as the lobby's chosen save */
+        {
+            ap->AppMode = 1;
+            ap->FromTitle = 1;
+            ap->LastLevel = 0;
+            TitleCall(ap->PortId, 8);
+            break;
+        }
+#endif
         if (ulFrame == 0) 
         { 
             McCrntResult = CheckMcSelectPortInfoState(0); 

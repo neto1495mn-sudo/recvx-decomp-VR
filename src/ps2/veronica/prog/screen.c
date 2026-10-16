@@ -9,7 +9,13 @@
 #include "../../../ps2/veronica/prog/ps2_NaMatrix.h"
 #include "../../../ps2/veronica/prog/ps2_NaSystem.h"
 #include "../../../ps2/veronica/prog/ps2_NaTextureFunction.h"
-/* #include "../../../ps2/veronica/prog/ps2_NaView.h" - the devs didn't include this originally */ 
+/* #include "../../../ps2/veronica/prog/ps2_NaView.h" - the devs didn't include this originally */
+#ifdef TARGET_PC
+/* without its prototype the float of njSetScreenProjection(dist) goes as a double on x86 and the
+   screen distance comes back wrong (2.0 instead of ~600) after bhDrawSmallScreenRenderTexture: the
+   weapon room's switch panel (RM_1050) was drawn tiny on a black screen */
+void njSetScreenProjection(float dist);
+#endif
 #include "../../../ps2/veronica/prog/ps2_NinjaCnk.h"
 #include "../../../ps2/veronica/prog/ps2_dummy.h"
 #include "../../../ps2/veronica/prog/pwksub.h"
