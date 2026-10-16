@@ -686,7 +686,17 @@ void bhDrawObject(O_WRK* op)
             njFogDisable();
         }
         
+#ifdef TARGET_PC
+        {   /* VR: the player's hand objects (the weapon on node 9, the left hand's on 13) follow the controllers at the headset's rate (gs_gl.c) */
+            extern int g_native_tag; extern int vr_hide_player(void);
+            int keep = g_native_tag;
+            if (op->lkwkp == (unsigned char*)plp && vr_hide_player()) g_native_tag = op->lkono == 13 ? 3 : 2;
+            bhPutModel((BH_PWORK*)op);
+            g_native_tag = keep;
+        }
+#else
         bhPutModel((BH_PWORK*)op);
+#endif
         
         njControl3D(0x100);
         

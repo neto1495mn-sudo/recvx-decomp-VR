@@ -1,5 +1,7 @@
 #ifdef TARGET_PC
 int vr_hide_player(void);   /* pc/glue/vr_glue.c */
+int vr_on(void);
+void vr_diag_frame(void);   /* pc/glue/vr_glue.c: the VR diagnosis (ini vr_debug_log) */
 void vr_draw_hands(void* p);   /* BH_PWORK* (declared before the types) */
 #endif
 #include "../../../ps2/veronica/prog/game.h"
@@ -97,6 +99,9 @@ void bhMainSequence()
                 bhDrawSmallScreenRenderTexture();
             }
             
+#ifdef TARGET_PC
+            vr_diag_frame();
+#endif
             if ((sys->gm_flg & 0x100)) 
             {
                 bhDrawFullScreenRenderTexture();
@@ -399,7 +404,13 @@ void bhAllDrawModel()
     njControl3D(0);
     bhSetHalfLight();
     if (sys->pt_flg & 2) {
+#ifdef TARGET_PC
+        { extern int g_native_tag; g_native_tag = 1; }   /* the characters' strips: VR smooths them (gs/stream.c) */
+#endif
         bhDrawEnemy();
+#ifdef TARGET_PC
+        { extern int g_native_tag; g_native_tag = 0; }
+#endif
     }
     njControl3D(0);
 #ifdef TARGET_PC

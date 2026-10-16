@@ -6811,6 +6811,12 @@ void bhEff110(O_WRK* op)
         case 1:
             break; 
         case 10:                                    
+#ifdef TARGET_PC
+            /* PC: the full-screen distortion (heat shimmer, under-water view) is not used: its flat
+               capture covered the 3D in VR */
+            op->mode0 = 1;
+            break;
+#endif
             if ((sys->gm_flg & 0x1)) 
             {
                 BHD_ASPECT_Y = 1.0f;
