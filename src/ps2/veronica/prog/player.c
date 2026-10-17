@@ -5268,6 +5268,12 @@ void bhCPM2_act_wre()
         
         plp->mode3++;
     case 1:
+#ifdef TARGET_PC
+        {   /* VR: the aim let go while walking - no lowering of the weapon, she walks at once */
+            extern int vr_walk_at_once(void);
+            if (vr_walk_at_once()) plp->frm_no = 0;
+        }
+#endif
         if (((int)plp->frm_no / 65536) < 2) 
         {
             plp->stflg &= ~0x10400;
