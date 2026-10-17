@@ -3289,7 +3289,7 @@ void bhSetYakkyou(BH_PWORK* pp, int wno, int jno, int hand, int ang) // fifth pa
         }
     }
 #ifdef TARGET_PC
-    { extern int vr_dual_block(void* pp, int jno); if (vr_dual_block(pp, jno)) return; }   /* VR: that hand did not fire */
+    { extern int vr_dual_block_shell(void* pp, int jno); if (vr_dual_block_shell(pp, jno)) return; }   /* VR: that hand did not fire */
 #endif
     
     eft = &WpnEffTab[wno][3];  
