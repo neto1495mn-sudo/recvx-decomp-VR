@@ -2367,6 +2367,9 @@ void CallEnemySeMain(unsigned int SlotNo, int SeNo, char Pan, char Vol, int Flag
         RequestInfo.BankNo = ((SeNo >> 0x8) & 0xF);
         RequestInfo.ListNo = SeNo;
 #ifdef TARGET_PC
+        { extern void vr_enemy_sound(int enemy_no, int se_no); vr_enemy_sound(EnemySlotInfo[SlotNo].EnemyNo, SeNo); }   /* VR: a hold's bites felt with their sound (pc/glue/vr_glue.c) */
+#endif
+#ifdef TARGET_PC
         if (RequestInfo.BankNo == 3)
         {
             pc_se_xbank = pc_enemy_se_bank[EnemySlotInfo[SlotNo].EnemyNo & 127];
