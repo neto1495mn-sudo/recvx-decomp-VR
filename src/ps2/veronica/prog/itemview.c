@@ -66,6 +66,9 @@ void DrawSubItem(S_WORK* st, SITEM* si)
     sc = &st_cam;
     fv = &fvwork;
     
+#ifdef TARGET_PC
+    { extern void vr_inv_item(int id); vr_inv_item((int)st->itemid); }   /* VR diagnosis: the item shown (its textures) */
+#endif
     dw_a = &dsptbl[st->itemid];
     
     njPushMatrix(NULL);
