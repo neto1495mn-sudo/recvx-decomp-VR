@@ -1970,6 +1970,9 @@ int CheckButton(int Level, int Flag, int MaxFlag)
         switch (Level) 
         {                            
         case 0:
+#ifdef TARGET_PC
+            if (ap->ModeCommandId[ap->Cursor[Level]] < 4) pc_title_font_leave();   /* vr146: the menu's font goes before a game mode */
+#endif
             switch (ap->ModeCommandId[ap->Cursor[Level]]) 
             {                 
             case 0:                            
@@ -2033,6 +2036,9 @@ int CheckButton(int Level, int Flag, int MaxFlag)
                 ap->Mode = 10;
                 CallSystemSe(0, 3);
                 break;
+            case 5:   /* vr145: EXIT - to the desktop, on the second press (lobby_glue.c) */
+                pc_title_exit();
+                break;
 #endif
             }
             
@@ -2071,7 +2077,11 @@ int CheckStartButton()
 
     temp = (ADV_WORK*)&AdvWork;
         
+#ifdef TARGET_PC
+    if ((Pad[temp->PortId].press & 0x900))   /* vr146: Select too (the left menu button in VR; Start is LT + Y) */
+#else
     if ((Pad[temp->PortId].press & 0x800))
+#endif
     { 
         CallSystemSeBasic(3, 0, 0); 
         

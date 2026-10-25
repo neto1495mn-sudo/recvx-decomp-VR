@@ -282,6 +282,7 @@ void bhSetPad()
     pad = knife_pad(pad);
     pad = menu_pad(pad);
     pad = trade_pad(pad);   /* co-op trade screen: its input, the player stands still */
+    pad = selmenu_pad(pad);   /* vr145: Select pauses with a menu (options_glue.c) */
 #endif
     
     sys->pad_ps = pad & ~sys->pad_oncpy; 

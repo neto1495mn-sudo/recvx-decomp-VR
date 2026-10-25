@@ -2370,6 +2370,9 @@ void bhSysCallScreenSaver()
         break;
     case 10:
         sys->ssv_an = 64.0f;
+#ifdef TARGET_PC
+        if (pc_selmenu_draw()) break;   /* vr145: the Select menu in place of the PAUSE message */
+#endif
         
         sys->mes_tp = pause_mes;
         
