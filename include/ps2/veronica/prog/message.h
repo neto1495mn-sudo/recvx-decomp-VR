@@ -18,6 +18,6 @@ void bhFontScaleSet(float ScaleX, float ScaleY, float ScaleCR);
 
 extern float FontScaleX;
 extern float FontScaleCR;
-extern const unsigned char FontSz[126];
+extern unsigned char FontSz[126];   /* vr138: filled from the disc (pc/glue/font_glue.c) */
 
 #endif

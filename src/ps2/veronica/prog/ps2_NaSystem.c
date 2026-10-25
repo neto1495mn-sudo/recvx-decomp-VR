@@ -96,7 +96,7 @@ void Ps2SwapDBuff()
     
     Ps2_vcount = 0; 
 
-    printf("TICK = %d\n", *(volatile unsigned int*)SR_CU0); 
+    /* vr137: sem log por quadro */ // printf("TICK = %d\n", *(volatile unsigned int*)SR_CU0);
     
     *(volatile unsigned int*)SR_CU0 = 0; 
     

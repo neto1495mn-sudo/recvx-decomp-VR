@@ -5046,10 +5046,17 @@ void bhCPM2_act_wpn()
                             eft->ay = plp->way;
                             
                             njCalcVector(NULL, &fps, &fpsb);
-                            
+#ifdef TARGET_PC
+                            {   /* VR: the arrow flies along the barrel in the hand, not the body's aim (pc/glue/vr_glue.c, vr136) */
+                                extern int vr_fly_dir(NJS_POINT3* v, int* ax, int* ay, int wno);
+                                int vax, vay;
+                                if (vr_fly_dir((NJS_POINT3*)&fpsb, &vax, &vay, plp->wpnr_no)) { eft->ax = vax; eft->ay = vay; }
+                            }
+#endif
+
                             bhSetEffectTb(eft, &fpsb, NULL, 0);
                             break;
-                        case 14:          
+                        case 14:
                             if (plp->wax < 0)
                             {
                                 njRotateX(NULL, -(plp->wax / 2));
