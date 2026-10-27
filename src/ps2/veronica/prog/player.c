@@ -5050,7 +5050,7 @@ void bhCPM2_act_wpn()
                             {   /* VR: the arrow flies along the barrel in the hand, not the body's aim (pc/glue/vr_glue.c, vr136) */
                                 extern int vr_fly_dir(NJS_POINT3* v, int* ax, int* ay, int wno);
                                 int vax, vay;
-                                if (vr_fly_dir((NJS_POINT3*)&fpsb, &vax, &vay, plp->wpnr_no)) { eft->ax = vax; eft->ay = vay; }
+                                if (vr_fly_dir((NJS_POINT3*)&fpsb, &vax, &vay, plp->wpnr_no)) { extern void vr_fly_from(float* p, int wno); eft->ax = vax; eft->ay = vay; vr_fly_from(&eft->px, plp->wpnr_no); }   /* vr214: from the muzzle, where the sight starts */
                             }
 #endif
 
@@ -5131,6 +5131,13 @@ void bhCPM2_act_wpn()
                             eft->ay = plp->way;
                             
                             njCalcVector(NULL, &fps, &fpsb);
+#ifdef TARGET_PC
+                            {   /* VR: the shell flies along the barrel in the hand, not the body's aim - the body turns with the head (vr202, as vr136) */
+                                extern int vr_fly_dir(NJS_POINT3* v, int* ax, int* ay, int wno);
+                                int vax, vay;
+                                if (vr_fly_dir((NJS_POINT3*)&fpsb, &vax, &vay, plp->wpnr_no)) { extern void vr_fly_from(float* p, int wno); eft->ax = vax; eft->ay = vay; vr_fly_from(&eft->px, plp->wpnr_no); }   /* vr214: from the muzzle, where the sight starts */
+                            }
+#endif
                             
                             bhSetEffectTb(eft, &fpsb, NULL, 0);
                             break;
@@ -5142,6 +5149,13 @@ void bhCPM2_act_wpn()
                             eft->ay = plp->way;
                             
                             njCalcVector(NULL, &fps, &fpsb);
+#ifdef TARGET_PC
+                            {   /* VR: the shell flies along the barrel in the hand, not the body's aim - the body turns with the head (vr202, as vr136) */
+                                extern int vr_fly_dir(NJS_POINT3* v, int* ax, int* ay, int wno);
+                                int vax, vay;
+                                if (vr_fly_dir((NJS_POINT3*)&fpsb, &vax, &vay, plp->wpnr_no)) { extern void vr_fly_from(float* p, int wno); eft->ax = vax; eft->ay = vay; vr_fly_from(&eft->px, plp->wpnr_no); }   /* vr214: from the muzzle, where the sight starts */
+                            }
+#endif
                             
                             bhSetEffectTb(eft, &fpsb, NULL, 0);
                             
@@ -5159,6 +5173,13 @@ void bhCPM2_act_wpn()
                             eft->ay = plp->way;
                             
                             njCalcVector(NULL, &fps, &fpsb);
+#ifdef TARGET_PC
+                            {   /* VR: the shell flies along the barrel in the hand, not the body's aim - the body turns with the head (vr202, as vr136) */
+                                extern int vr_fly_dir(NJS_POINT3* v, int* ax, int* ay, int wno);
+                                int vax, vay;
+                                if (vr_fly_dir((NJS_POINT3*)&fpsb, &vax, &vay, plp->wpnr_no)) { extern void vr_fly_from(float* p, int wno); eft->ax = vax; eft->ay = vay; vr_fly_from(&eft->px, plp->wpnr_no); }   /* vr214: from the muzzle, where the sight starts */
+                            }
+#endif
                             
                             bhSetEffectTb(eft, &fpsb, NULL, 0);
                             

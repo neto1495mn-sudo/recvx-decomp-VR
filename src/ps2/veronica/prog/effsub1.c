@@ -3406,6 +3406,12 @@ void bhEff013(O_WRK* op)
         {
             op->ct1 = -1;
         }
+#ifdef TARGET_PC
+        {   /* VR: the bolt flies straight where the bow gun points - no turning towards the nearest enemy (pc/glue/vr_glue.c, vr210) */
+            extern int vr_no_homing(void);
+            if (vr_no_homing()) op->ct1 = -1;
+        }
+#endif
         
         op->mode0 = 1;
     case 1:                                         
@@ -3475,6 +3481,21 @@ void bhEff013(O_WRK* op)
             }
         }
         
+#ifdef TARGET_PC
+        {   /* VR (vr211): the bolt always drops as it flies - the grenade's gravity, 0.02 a frame (bhEff130) - instead of
+               bending down only when it was steered at an enemy (the steer is off in VR: vr_no_homing) */
+            extern int vr_no_homing(void);
+            if (vr_no_homing()) {
+                float vl;
+                op->loy -= 0.02f;
+                vl = njSqrt(op->lox * op->lox + op->loy * op->loy + op->loz * op->loz);
+                if (vl > 0.0f) {
+                    op->ay = 10430.381f * atan2f(-op->lox, -op->loz);
+                    op->ax = 10430.381f * asinf(op->loy / vl);
+                }
+            }
+        }
+#endif
         lp.ox *= 3.0f;
         lp.oy *= 3.0f;
         lp.oz *= 3.0f;
@@ -9035,6 +9056,12 @@ void bhEff130(O_WRK* op)
     int i;          
     NJS_VECTOR vc0, vc1;  
 
+#ifdef TARGET_PC
+    {   /* VR log (vr210): where the grenade ended against the way it was fired - sideways drift (not gravity) */
+        extern void vr_grenade_end(int ay, float sx, float sz, float ex, float ez, int mode);
+        if (op->mode0 == 2) vr_grenade_end(op->ay, op->gpx, op->gpz, op->px, op->pz, op->type);
+    }
+#endif
     switch (op->mode0)
     {                      
     case 0:                                         

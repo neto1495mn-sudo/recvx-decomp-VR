@@ -259,7 +259,12 @@ void bhCPM2_act_scp()
 
     if (plp->mode3 != 3) 
     {
+#ifdef TARGET_PC
+        extern int vr_scope_zoom(void);
+        if (!(sys->pad_on & 0x80) && !vr_scope_zoom())   /* VR: the zoom on the right stick (pc/glue/vr_glue.c, vr220) */
+#else
         if (!(sys->pad_on & 0x80))
+#endif
         {
             cam.ppers = 11832;
         }

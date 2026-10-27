@@ -3335,6 +3335,9 @@ void bhEne01_DmgCheck(BH_PWORK* epw)
 }
 
 // 100% matching!
+#ifdef TARGET_PC
+int vr_head_joint(int djnt); void vr_head_ofs(BH_PWORK* epp, BH_PWORK* epw, NJS_POINT3* o); int vr_crit_take(BH_PWORK* epw);
+#endif
 void bhEne01_SetBlood(BH_PWORK* epw, int hp)
 {
 	WPNDAMAGE_WORK* wp_tbl;
@@ -3354,9 +3357,24 @@ void bhEne01_SetBlood(BH_PWORK* epw, int hp)
         epp = epw;
     }
     
+#ifdef TARGET_PC
+    /* VR (vr216): a head shot bleeds at the point hit on the head (vr_glue.c) */
+    int vr_hb = vr_head_joint(epw->djnt_no);
+    NJS_POINT3 vr_hofs;
+    if (vr_hb) vr_head_ofs(epp, epw, &vr_hofs);
+#define VRB_OBJ(o) (vr_hb ? 11 : (o))
+#define VRB_OFS(p) (vr_hb ? &vr_hofs : (p))
+#else
+#define VRB_OBJ(o) (o)
+#define VRB_OFS(p) (p)
+#endif
     if (!(wp_tbl->flg & 0x4000))
     {
+#ifdef TARGET_PC
+        if ((epw->djnt_no == 9) || (epw->djnt_no == 1) || (epw->djnt_no == 8) || vr_head_joint(epw->djnt_no))   /* VR: the head too (vr_glue.c, vr215) */
+#else
         if ((epw->djnt_no == 9) || (epw->djnt_no == 1) || (epw->djnt_no == 8))
+#endif
         {
             ofp.x = -epw->dvx;
             ofp.y = -epw->dvy;
@@ -3387,20 +3405,20 @@ void bhEne01_SetBlood(BH_PWORK* epw, int hp)
                 {
                     if (epw->comb_flg & 0x40)
                     {
-                        bhEne_SetBlood4(epp, obj_no, &ofp, bhEne01_ChgTextID(epp, 6), 3);
+                        bhEne_SetBlood4(epp, VRB_OBJ(obj_no), VRB_OFS(&ofp), bhEne01_ChgTextID(epp, 6), 3);
                     } 
                     else
                     {
-                        bhEne_SetBlood4(epp, obj_no, &ofp, bhEne01_ChgTextID(epp, 6), 1);
+                        bhEne_SetBlood4(epp, VRB_OBJ(obj_no), VRB_OFS(&ofp), bhEne01_ChgTextID(epp, 6), 1);
                     }
                     
                     ofp.x = ofp.z = 0.0f;
                     ofp.y = 2.5f;
-                    bhEne_SetBlood2(epp, 9, &ofp, plp->way);
+                    bhEne_SetBlood2(epp, VRB_OBJ(9), VRB_OFS(&ofp), plp->way);
                 } 
                 else
                 {
-                    bhEne_SetBlood4(epp, obj_no, &ofp, bhEne01_ChgTextID(epp, 6), 0);
+                    bhEne_SetBlood4(epp, VRB_OBJ(obj_no), VRB_OFS(&ofp), bhEne01_ChgTextID(epp, 6), 0);
                 }
             }
         }
@@ -3408,7 +3426,7 @@ void bhEne01_SetBlood(BH_PWORK* epw, int hp)
         {
             if (wp_tbl->nm_blood == 9)
             {
-                bhEne_SetBlood2(epp, 9, &ofp, plp->way);
+                bhEne_SetBlood2(epp, VRB_OBJ(9), VRB_OFS(&ofp), plp->way);
 
                 if ((1 < epw->djnt_no) && (epw->djnt_no < 8))
                 {
@@ -3425,11 +3443,11 @@ void bhEne01_SetBlood(BH_PWORK* epw, int hp)
                 
                 if (epw->comb_flg & 0x40)
                 {
-                    bhEne_SetBlood4(epp, obj_no, &ofp, bhEne01_ChgTextID(epp, 6), 3);
+                    bhEne_SetBlood4(epp, VRB_OBJ(obj_no), VRB_OFS(&ofp), bhEne01_ChgTextID(epp, 6), 3);
                 } 
                 else
                 {
-                    bhEne_SetBlood4(epp, obj_no, &ofp, bhEne01_ChgTextID(epp, 6), 0);
+                    bhEne_SetBlood4(epp, VRB_OBJ(obj_no), VRB_OFS(&ofp), bhEne01_ChgTextID(epp, 6), 0);
                 }
             } 
             else
@@ -3446,6 +3464,8 @@ void bhEne01_SetBlood(BH_PWORK* epw, int hp)
         ofp.z = owk->mtx[14];
         bhEne_SetNikuhenEffect2(epp, 0, &ofp, 4, bhEne01_ChgTextID(epp, 5));
     }
+#undef VRB_OBJ
+#undef VRB_OFS
 }
 
 // 100% matching!
@@ -3476,7 +3496,11 @@ void bhEne01_DmgCheckType00(BH_PWORK* epw)
             }
             return;
         } 
+#ifdef TARGET_PC
+        else if (((wp_tbl->flg & 0x10) || vr_crit_take(epw)) && !(EXP0_I(0x40) & 0x440000) && (bhEne01_CheckExpHead(epw) != 0))   /* VR: the critical (vr216) */
+#else
         else if ((wp_tbl->flg & 0x10) && !(EXP0_I(0x40) & 0x440000) && (bhEne01_CheckExpHead(epw) != 0))
+#endif
         {
             epw->hp = -1;
             if (cepw != NULL)
