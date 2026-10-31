@@ -379,10 +379,13 @@ void bhDispFont(NJS_POINT2* pos, int code, int color, float pri)
     njColorBlendingMode(1, 6);
     
 #ifdef TARGET_PC
+    NJS_POINT2 at;
+
     {
         void* tl = &sys->ef_tlist;
+        float dx = 0;
 
-        code = pc_font_glyph(code, &tl);   /* the cell in its language's font (pc/glue/lang_glue.c); a subtitle's own font */
+        code = pc_font_glyph(code, &tl, &dx);   /* the cell in its language's font (pc/glue/lang_glue.c); a subtitle's own font */
 
         if (code < 0)
         {
@@ -390,6 +393,9 @@ void bhDispFont(NJS_POINT2* pos, int code, int color, float pri)
         }
 
         njSetTexture((NJS_TEXLIST*)tl);
+        at.x = pos->x + dx * FontScaleX;   /* (a glyph drawn left of its cell's start: proportional letters) */
+        at.y = pos->y;
+        pos = &at;
     }
 #else
     njSetTexture(&sys->ef_tlist);
@@ -482,10 +488,13 @@ void bhDispFontEx(NJS_POINT2* pos, int code, unsigned int argb, float pri)
     njColorBlendingMode(1, 6);
     
 #ifdef TARGET_PC
+    NJS_POINT2 at;
+
     {
         void* tl = &sys->ef_tlist;
+        float dx = 0;
 
-        code = pc_font_glyph(code, &tl);   /* the cell in its language's font (pc/glue/lang_glue.c); a subtitle's own font */
+        code = pc_font_glyph(code, &tl, &dx);   /* the cell in its language's font (pc/glue/lang_glue.c); a subtitle's own font */
 
         if (code < 0)
         {
@@ -493,6 +502,9 @@ void bhDispFontEx(NJS_POINT2* pos, int code, unsigned int argb, float pri)
         }
 
         njSetTexture((NJS_TEXLIST*)tl);
+        at.x = pos->x + dx * FontScaleX;   /* (a glyph drawn left of its cell's start: proportional letters) */
+        at.y = pos->y;
+        pos = &at;
     }
 #else
     njSetTexture(&sys->ef_tlist);
